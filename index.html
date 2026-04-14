@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incidental Charges Authorization</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <main class="container">
+        <div class="card" id="form-card">
+            <div class="card-header">
+                <img src="logo.JPG" alt="Tucker Peak Lodge Logo" class="business-logo">
+                <h1>Incidental Charges Authorization</h1>
+                <div class="header-description">
+                    <p><strong>Important: Complete Your Self Check-In for Tucker Peak Lodge</strong></p>
+                    <p>We're excited to welcome you to Tucker Peak Lodge! To guarantee a seamless self check-in, please take a moment to complete this brief, secure form.</p>
+                    <p><strong>Why we need your credit card:</strong> Even if your stay is paid in full, we must securely collect a credit card on file for incidentals. If you booked through a third party (like Expedia or Booking.com), your credit card details are not shared with us, making this step necessary to finalize your check-in.</p>
+                    <p>On the day of your arrival, we will text your room number and security code.</p>
+                    <p>Thank you for helping us prepare for your stay!</p>
+                </div>
+            </div>
+            <div id="passcode-gate">
+                <div class="section-title">Security Check</div>
+                <p style="margin-bottom: 1rem; color: #4b5563; font-size: 0.95rem;">Please enter the last 4 digits of the mobile phone number used for this reservation.</p>
+                <div class="form-group">
+                    <input type="text" id="security-passcode" placeholder="----" maxlength="4" style="font-size: 1.5rem; text-align: center; letter-spacing: 5px;" autocomplete="off">
+                </div>
+                <p id="passcode-error" class="hide" style="color: #ef4444; margin-bottom: 1rem; font-weight: 500;">Please enter exactly 4 digits.</p>
+                <button type="button" class="submit-btn" id="unlock-btn">Unlock Secure Form</button>
+            </div>
+            <div id="dynamic-form-container"></div>
+        </div>
+
+        <div class="card hide" id="success-card">
+            <div class="success-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <h1>Authorization Successful</h1>
+            <p>Thank you! We have received your information and your room is securely held. Enjoy your stay!</p>
+    </main>
+
+    <footer class="site-footer">
+        <p><strong>Tucker Peak Lodge</strong></p>
+        <p>3975 Eagle Peak Road, Julian, CA 92036</p>
+        <p>Phone: <a href="tel:760-765-3975">760-765-3975</a> | Email: <a href="mailto:JulianTuckerPeakLodge@gmail.com">JulianTuckerPeakLodge@gmail.com</a></p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
