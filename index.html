@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://d33xocn7sn66xl.cloudfront.net; connect-src 'self' https://script.google.com https://script.googleusercontent.com;">
     <title>Incidental Charges Authorization</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.3.2/jsencrypt.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.3.2/jsencrypt.min.js" integrity="sha512-/+WPpcPix+jdfITdEXAZVolW6akug7Z5B8vdJxWKTJV7xJ/erB7Nu9XdsR6HLRinktz2S8q2GTxgnAgTPHJIEA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
     <main class="container">
@@ -22,14 +24,18 @@
                     <p>Thank you for helping us prepare for your stay!</p>
                 </div>
             </div>
-            <div id="passcode-gate">
-                <div class="section-title">Security Check</div>
-                <p style="margin-bottom: 1rem; color: #4b5563; font-size: 0.95rem;">Please enter the last 4 digits of the mobile phone number used for this reservation.</p>
+            <div id="page-1-gate">
+                <div class="section-title">Guest Identification</div>
+                <p style="margin-bottom: 1rem; color: #4b5563; font-size: 0.95rem;">Please verify your name and mobile number to continue securely.</p>
                 <div class="form-group">
-                    <input type="text" id="security-passcode" placeholder="----" maxlength="4" style="font-size: 1.5rem; text-align: center; letter-spacing: 5px;" autocomplete="off">
+                    <label for="step1-fullName">Full Name</label>
+                    <input type="text" id="step1-fullName" required placeholder="John Doe">
                 </div>
-                <p id="passcode-error" class="hide" style="color: #ef4444; margin-bottom: 1rem; font-weight: 500;">Please enter exactly 4 digits.</p>
-                <button type="button" class="submit-btn" id="unlock-btn">Unlock Secure Form</button>
+                <div class="form-group">
+                    <label for="step1-mobile">Mobile Number</label>
+                    <input type="tel" id="step1-mobile" required placeholder="(555) 123-4567" maxlength="14">
+                </div>
+                <button type="button" class="submit-btn" id="next-btn">Next</button>
             </div>
             <div id="dynamic-form-container"></div>
         </div>
